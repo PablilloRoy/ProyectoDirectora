@@ -1,0 +1,1 @@
+//no sirve de nada, ya que no se puede usar en el navegador
