@@ -1,9 +1,11 @@
 <?php
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '../../vendor/autoload.php';
 
-use Dotenv\Dotenv; 
-// load the .env file containing environment variables
+use Dotenv\Dotenv;
+
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+
 
 $dotenv->load();
 // Check if the environment variables are set

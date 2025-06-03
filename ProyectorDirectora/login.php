@@ -1,8 +1,16 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
+
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
+
 //* Arreglo con errores
 $errores = [
     'matricula' => '',
     'password' => '',
+    'credenciales' => ''
 ];
 
 $matricula = "";
@@ -19,19 +27,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($password)) {
         $errores['password'] = "La contraseña es obligatoria";
     }
+    
+    // Verificar credenciales si no hay errores
+    if (empty($errores['matricula']) && empty($errores['password'])) {
+        $validMatricula = $_ENV['VALID_USER_MATRICULA'];
+        $validPassword = $_ENV['VALID_USER_PASSWORD'];
+        
+        if ($matricula !== $validMatricula || $password !== $validPassword) {
+            $errores['credenciales'] = "Matrícula o contraseña incorrectas";
+        } else {
+            // Credenciales correctas - redirigir o iniciar sesión
+            session_start();
+            $_SESSION['matricula'] = $matricula;
+            $_SESSION['logged_in'] = true;
+            
+            header('Location: index.php'); // Cambia por tu ruta
+            exit;
+        }
+    }
 }
+
 // Ajusta esta ruta según tu estructura real
 require 'include/function.php';
 incluirTemplate('header-forms-user');
-
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    link
     <!-- Ajusta la ruta del CSS -->
     <link rel="stylesheet" href="styles/bundle.css">
     <style>
@@ -55,12 +81,21 @@ incluirTemplate('header-forms-user');
             border: none;
             cursor: pointer;
         }
+        .error-credenciales {
+            color: red;
+            margin-bottom: 15px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <div class="container formulario-container">
     <form class="formulario-estudiante" method="POST">
         <h1>¡Bienvenidos!</h1>
+        
+        <?php if($errores['credenciales']): ?>
+            <div class="error-credenciales"><?php echo $errores['credenciales']; ?></div>
+        <?php endif; ?>
         
         <div class="formulario-grupo">
             <label for="matricula">Matrícula</label>
@@ -102,5 +137,5 @@ incluirTemplate('header-forms-user');
 
 <script src="public/js/index.js"></script>
 <?php
-
-
+// Cierra la conexión si es necesario
+?>
